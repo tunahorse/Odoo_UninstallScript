@@ -2,6 +2,8 @@
 
 This Bash script completely removes the Odoo ERP system and its associated components, including the PostgreSQL database, from a Linux-based system. The script will display a warning message and ask the user to confirm before proceeding. If the user agrees, it will execute each step with a green-colored description.
 
+Inspired by [uninstall script #67](https://github.com/Yenthe666/InstallScript/issues/67)
+
 ## Usage
 
 1. Save the content of the script provided in the 'remove_odoo.sh' file.
