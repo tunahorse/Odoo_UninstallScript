@@ -38,16 +38,26 @@ if [[ $response =~ ^([yY][eE][sS]|[yY])$ ]]; then
   # Step 5: Remove logs
   green "Removing logs..."
   sudo rm -R /var/log/odoo
-
   # Step 6: Remove databases
-  green "Removing databases..."
-  sudo service postgresql stop
-  sudo apt-get remove postgresql -y
-  sudo apt-get --purge remove postgresql* -y
-  sudo rm -r -f /etc/postgresql/
-  sudo rm -r -f /etc/postgresql-common/
-  sudo rm -r -f /var/lib/postgresql/
+  green "Would you like to remove PostgreSQL completely or just a specific database? [COMPLETE/DB_NAME]: "
+  read -r db_choice
 
+  if [[ $db_choice == "COMPLETE" ]]; then
+    green "Removing PostgreSQL..."
+    sudo service postgresql stop
+    sudo apt-get remove postgresql -y
+    sudo apt-get --purge remove postgresql* -y
+    sudo rm -r -f /etc/postgresql/
+    sudo rm -r -f /etc/postgresql-common/
+    sudo rm -r -f /var/lib/postgresql/
+  else
+    green "Removing the database $db_choice..."
+    sudo su - postgres -c "psql -c \"SELECT pg_terminate_backend(pg_stat_activity.pid) FROM pg_stat_activity WHERE pg_stat_activity.datname = '$db_choice' AND pid <> pg_backend_pid();\""
+    sudo su - postgres -c "psql -c \"DROP DATABASE $db_choice;\""
+  fi
+
+
+ 
   # Step 7: Delete users and groups
   green "Deleting users and groups..."
   sudo userdel -r postgres
